@@ -1,6 +1,7 @@
 <?php namespace bot\base;
 
 use yii\helpers\Json;
+use yii\helpers\ArrayHelper as AH;
 
 /**
  * Object is the base class that implements the *property* feature.
@@ -75,7 +76,7 @@ class Object
     public function __construct($config = [])
     {
         if (!empty($config)) {
-            Bot::configure($this, $config);
+            \Yii::configure($this, $config);
         }
 
         $this->init();
@@ -159,7 +160,8 @@ class Object
      */
     public function __isset($name)
     {
-        return isset($this->properties[$name]);
+        $properties = $this->properties;
+        return AH::keyExists($name, $properties);
     }
 
     /**
@@ -173,13 +175,13 @@ class Object
      *
      * If the property is read-only, it will throw an exception.
      * @param string $name the property name
-     * @return true mean the property deleted
+     * @return mixed the property last value
      * @see http://php.net/manual/en/function.unset.php
      */
     public function __unset($name)
     {
-        unset($this->properties[$name]);
-        return true;
+        $properties = $this->properties;
+        return AH::remove($properties, $name, null);
     }
 
     /**
@@ -296,6 +298,7 @@ class Object
     /**
      * @param string $name the method name
      * @return string the action's name
+     * @throws \Exception
      */
     private function findPropertyAction($name)
     {
@@ -310,7 +313,8 @@ class Object
             }
         }
 
-        return 'set';
+        $info = get_class($this) . "::$name()";
+        throw new \Exception('Calling unknown method: ' . $info);
     }
 
     /**

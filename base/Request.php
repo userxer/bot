@@ -5,7 +5,7 @@ use bot\helper\Curl;
 use bot\object\File;
 use bot\helper\Token;
 use yii\helpers\Json;
-use yii\helpers\ArrayHelper;
+use yii\helpers\ArrayHelper as AH;
 
 /**
  * All queries to the Telegram Bot API must be served over
@@ -53,7 +53,7 @@ class Request extends Object
      * @param string $name the property name or the event name
      * @return bool whether the named property is set (not null).
      */
-    public function hasParameter($name)
+    public function has($name)
     {
         return $this->__isset($name);
     }
@@ -70,7 +70,7 @@ class Request extends Object
      * @param string $name the property name
      * @return $this
      */
-    public function delParameter($name)
+    public function delete($name)
     {
         $this->__unset($name);
         return $this;
@@ -83,7 +83,7 @@ class Request extends Object
      * @param mixed $value the property value
      * @return $this
      */
-    public function setParameter($name, $value)
+    public function set($name, $value)
     {
         $this->__set($name, $value);
         return $this;
@@ -98,7 +98,7 @@ class Request extends Object
      *
      * @return mixed
      */
-    public function getParameter($name, $default = null)
+    public function get($name, $default = null)
     {
         if ($this->__isset($name)) {
             return $this->__get($name);
@@ -113,7 +113,7 @@ class Request extends Object
      * @param string $token the bot token string
      * @return array
      */
-    public function send($token)
+    public function sendBy($token)
     {
         if ($this->hasFile()) {
             return $this->sendFile($token);
@@ -135,8 +135,8 @@ class Request extends Object
         $cID = 'B:' . $tObj->id . ':';
 
         // Cache duration time
-        $duration = $this->getParameter('cache_time', 0);
-        $this->delParameter('cache_time');
+        $duration = $this->get('cache_time', 0);
+        $this->delete('cache_time');
 
         // Replace files instead short ID as file.
         $this->replaceFileID($cID);
@@ -152,7 +152,7 @@ class Request extends Object
         });
 
         // Set cache duration again
-        $this->setParameter('cache_time', $duration);
+        $this->set('cache_time', $duration);
 
         // Save Files IDs
         $this->saveFileID($cID, $duration, $res);
@@ -226,21 +226,10 @@ class Request extends Object
         foreach ($params as $key => $value) {
             if ($value instanceof InputFile) {
                 $path = $value->getFilename();
-                $fID = $cID . md5($path);
+                $fID = $cID . md5_file($path);
 
-                if ($data = \Yii::$app->cache->get($fID)) {
-                    $fileMTime = 0;
-                    if (file_exists($path)) {
-                        $fileMTime = filemtime($path);
-                    }
-
-                    if ($fileMTime > $data['file_m_time']) {
-                        \Yii::$app->cache->delete($fID);
-                    }
-                    else {
-                        $file_id = $data['file_id'];
-                        $this->setParameter($key, $file_id);
-                    }
+                if ($file_id = \Yii::$app->cache->get($fID)) {
+                    $this->set($key, $file_id);
                 }
             }
         }
@@ -265,24 +254,17 @@ class Request extends Object
                     isset($response['result'][$key])
                 ) {
                     $path = $value->getFilename();
-                    $fID = $cID . md5($path);
+                    $fID = $cID . md5_file($path);
 
                     $file = $response['result'][$key];
-                    if (ArrayHelper::isIndexed($file)) {
+                    if (AH::isIndexed($file)) {
                         $file = end($file);
                     }
 
                     $file = new File($file);
                     if ($file->hasFileId() && !\Yii::$app->get($fID, false)) {
-                        $fileMTime = 0;
-                        if (file_exists($path)) {
-                            $fileMTime = filemtime($path);
-                        }
-
-                        \Yii::$app->cache->set($fID, [
-                            'file_m_time' => $fileMTime,
-                            'file_id' => $file->getFileId()
-                        ], $duration);
+                        $file_id = $file->getFileId();
+                        \Yii::$app->cache->set($fID, $file_id, $duration);
                     }
                 }
             }

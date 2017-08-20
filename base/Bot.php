@@ -1,6 +1,5 @@
 <?php namespace bot\base;
 
-use yii\base\Object;
 use bot\object\Chat;
 use bot\object\User;
 use bot\helper\Token;
@@ -8,6 +7,7 @@ use yii\helpers\Json;
 use bot\object\Update;
 use bot\helper\Callback;
 use bot\helper\Comparator;
+use yii\helpers\ArrayHelper as AH;
 
 /**
  * Bots are third-party applications that run inside Telegram.
@@ -21,7 +21,7 @@ use bot\helper\Comparator;
  * @package bot
  * @link https://core.telegram.org/bots
  */
-class Bot extends Object
+class Bot extends \yii\base\Object
 {
 
     /**
@@ -69,18 +69,71 @@ class Bot extends Object
     public static $chat;
 
     /**
-     * Configures an object with the initial property values.
-     * @param object $object the object to be configured
-     * @param array $properties the property initial values given in terms of name-value pairs.
-     * @return object the object itself
+     * The bot properties
+     * @var array
      */
-    public static function configure($object, $properties)
-    {
-        foreach ($properties as $name => $value) {
-            $object->$name = $value;
-        }
+    public static $configs = [];
 
-        return $object;
+    /**
+     * Checks if a property is set, i.e.
+     * defined and not null.
+     *
+     * Note that if the property is not defined,
+     * false will be returned.
+     *
+     * @param string $key the property name or the event name
+     * @return bool whether the named property is set (not null).
+     */
+    public static function has($key)
+    {
+        $configs = self::$configs;
+        return AH::keyExists($key, $configs);
+    }
+
+    /**
+     * Sets an object property to null.
+     *
+     * Note that if the property is not defined,
+     * this method will do nothing.
+     *
+     * If the property is read-only,
+     * it will throw an exception.
+     *
+     * @param string $key the property name
+     * @return true
+     */
+    public static function delete($key)
+    {
+        AH::remove(self::$configs, $key);
+        return true;
+    }
+
+    /**
+     * Sets value of an object property.
+     *
+     * @param string $key the property name or the event name
+     * @param mixed $value the property value
+     * @return $this
+     */
+    public static function set($key, $value)
+    {
+        self::$configs[$key] = $value;
+        return $value;
+    }
+
+    /**
+     * Returns the value of an object property.
+     *
+     * @param string $key the property name
+     * @param mixed $default the default value to be returned if the specified array
+     * key does not exist. Not used when getting value from an object.
+     *
+     * @return mixed
+     */
+    public static function get($key, $default = null)
+    {
+        $configs = self::$configs;
+        return AH::getValue($configs, $key, $default);
     }
 
     /**
@@ -95,9 +148,10 @@ class Bot extends Object
         if (self::$update->hasMessage()) {
             $message = self::$update->getMessage();
             if ($message->hasText()) {
+                $params = self::$configs;
                 $text = $message->getText();
                 if (Comparator::compare($pattern, $text, $params)) {
-                    (new Callback($callback, $params));
+                    Callback::call($callback, $params);
                     return true;
                 }
             }
@@ -119,9 +173,10 @@ class Bot extends Object
         if (self::$update->hasEditedMessage()) {
             $message = self::$update->getEditedMessage();
             if ($message->hasText()) {
+                $params = self::$configs;
                 $text = $message->getText();
                 if (Comparator::compare($pattern, $text, $params)) {
-                    (new Callback($callback, $params));
+                    Callback::call($callback, $params);
                     return true;
                 }
             }
@@ -142,9 +197,10 @@ class Bot extends Object
         if (self::$update->hasChannelPost()) {
             $message = self::$update->getChannelPost();
             if ($message->hasText()) {
+                $params = self::$configs;
                 $text = $message->getText();
                 if (Comparator::compare($pattern, $text, $params)) {
-                    (new Callback($callback, $params));
+                    Callback::call($callback, $params);
                     return true;
                 }
             }
@@ -166,9 +222,10 @@ class Bot extends Object
         if (self::$update->hasEditedChannelPost()) {
             $message = self::$update->getEditedChannelPost();
             if ($message->hasText()) {
+                $params = self::$configs;
                 $text = $message->getText();
                 if (Comparator::compare($pattern, $text, $params)) {
-                    (new Callback($callback, $params));
+                    Callback::call($callback, $params);
                     return true;
                 }
             }
@@ -189,9 +246,10 @@ class Bot extends Object
         if (self::$update->hasInlineQuery()) {
             $inline = self::$update->getInlineQuery();
             if ($inline->hasQuery()) {
+                $params = self::$configs;
                 $query = $inline->getQuery();
                 if (Comparator::compare($pattern, $query, $params)) {
-                    (new Callback($callback, $params));
+                    Callback::call($callback, $params);
                     return true;
                 }
             }
@@ -213,9 +271,10 @@ class Bot extends Object
         if (self::$update->hasChosenInlineResult()) {
             $result = self::$update->getChosenInlineResult();
             if ($result->hasResultId()) {
+                $params = self::$configs;
                 $result_id = $result->getResultId();
                 if (Comparator::compare($pattern, $result_id, $params)) {
-                    (new Callback($callback, $params));
+                    Callback::call($callback, $params);
                     return true;
                 }
             }
@@ -236,9 +295,10 @@ class Bot extends Object
         if (self::$update->hasCallbackQuery()) {
             $cQuery = self::$update->getCallbackQuery();
             if ($cQuery->hasData()) {
+                $params = self::$configs;
                 $data = $cQuery->getData();
                 if (Comparator::compare($pattern, $data, $params)) {
-                    (new Callback($callback, $params));
+                    Callback::call($callback, $params);
                     return true;
                 }
             }
@@ -260,9 +320,10 @@ class Bot extends Object
         if (self::$update->hasShippingQuery()) {
             $shipping = self::$update->getShippingQuery();
             if ($shipping->hasId()) {
+                $params = self::$configs;
                 $id = $shipping->getId();
                 if (Comparator::compare($pattern, $id, $params)) {
-                    (new Callback($callback, $params));
+                    Callback::call($callback, $params);
                     return true;
                 }
             }
@@ -284,9 +345,10 @@ class Bot extends Object
         if (self::$update->hasPreCheckoutQuery()) {
             $query = self::$update->getPreCheckoutQuery();
             if ($query->hasId()) {
+                $params = self::$configs;
                 $id = $query->getId();
                 if (Comparator::compare($pattern, $id, $params)) {
-                    (new Callback($callback, $params));
+                    Callback::call($callback, $params);
                     return true;
                 }
             }
@@ -302,6 +364,7 @@ class Bot extends Object
      */
     public function init()
     {
+        self::$configs = [];
         $update = file_get_contents('php://input');
         if (!empty($update) && is_string($update)) {
             self::setUpdate($update);

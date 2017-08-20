@@ -1,6 +1,7 @@
 <?php namespace bot\base;
 
 use bot\helper\Token;
+use bot\method\copy;
 use bot\method\getMe;
 use bot\method\getFile;
 use bot\method\getChat;
@@ -55,6 +56,7 @@ use bot\method\getChatAdministrators;
 use bot\method\editMessageReplyMarkup;
 use bot\method\answerPreCheckoutQuery;
 use bot\method\setStickerPositionInSet;
+use bot\object\Message;
 
 /**
  * This API allows you to build your own customized Telegram clients.
@@ -88,6 +90,15 @@ class API
     {
         (new Token($token));
         $this->_token = $token;
+    }
+
+    /**
+     * @param Message $message
+     * @return copy
+     */
+    public function copy(Message $message)
+    {
+        return new copy($this->_token, $message);
     }
 
     /**
