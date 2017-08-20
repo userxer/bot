@@ -1,0 +1,23 @@
+{
+  "name": "khoram/bot",
+  "description": "Create free, easy and fast your telegram's bot.",
+  "type": "yii2-extension",
+  "keywords": ["yii2","extension","telegram","bots","api"],
+  "minimum-stability": "dev",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Mehdi Khodayari Khoram",
+      "email": "mehdi.khodayari.khoram@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.5.0",
+    "yiisoft/yii2": ">=2.0.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "bot\\": ""
+    }
+  }
+}
