@@ -10,10 +10,10 @@ There's a… bot for that. Just talk to [BotFather](https://telegram.me/botfathe
 
 ### Require this package with Composer
 Install this package through [Composer](https://getcomposer.org/).
-Edit your project's `composer.json` file to require `"khoram/bot": "2.0.1"` 
+Edit your project's `composer.json` file to require `"khoram/bot": "*"` 
 **Or** run this command in your command line:
 ```bash
-composer require khoram/bot 2.0.1
+composer require khoram/bot
 ```
 
 ### Create bot object
