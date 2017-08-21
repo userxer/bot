@@ -9,6 +9,6 @@ use bot\base\Object;
  * Class Keyboard
  * @package bot\keyboard
  */
-class Keyboard extends Object
+abstract class Keyboard extends Object
 {
 }
