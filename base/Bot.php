@@ -366,7 +366,11 @@ class Bot extends \yii\base\Object
     {
         self::$configs = [];
         $update = file_get_contents('php://input');
-        if (!empty($update) && is_string($update)) {
+        
+        if (
+            self::$update == null && 
+            !empty($update) && is_string($update)
+        ) {
             self::setUpdate($update);
         }
 
