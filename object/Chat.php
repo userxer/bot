@@ -13,6 +13,7 @@
  * @method bool hasPhoto()
  * @method bool hasDescription()
  * @method bool hasInviteLink()
+ * @method bool hasPinnedMessage()
  * @method int getId($default = null)
  * @method string getType($default = null)
  * @method string getTitle($default = null)
@@ -23,6 +24,7 @@
  * @method ChatPhoto getPhoto($default = null)
  * @method string getDescription($default = null)
  * @method string getInviteLink($default = null)
+ * @method Message getPinnedMessage($default = null)
  *
  * @author Mehdi Khodayari <mehdi.khodayari.khoram@gmail.com>
  * @since 2.0.1
@@ -79,7 +81,8 @@ class Chat extends Object
     protected function relations()
     {
         return [
-            'photo' => ChatPhoto::className()
+            'photo' => ChatPhoto::className(),
+            'pinned_message' => Message::className()
         ];
     }
 }
