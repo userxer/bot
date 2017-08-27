@@ -42,7 +42,24 @@ use yii\helpers\ArrayHelper as AH;
  */
 class Request extends Object
 {
+    
+    /**
+     * Telegram's bot token
+     * @var string
+     */
+    protected $_token;
 
+    /**
+     * Request constructor.
+     * @param string $token
+     * @param array $params
+     */
+    public function __construct($token = null, array $params = [])
+    {
+        $this->_token = $token;
+        parent::__construct($params);
+    }
+    
     /**
      * Checks if a property is set, i.e.
      * defined and not null.
@@ -111,15 +128,30 @@ class Request extends Object
      * Send this request by this method.
      *
      * @param string $token the bot token string
+     * @param array $params
      * @return array
      */
-    public function sendBy($token)
+    public function sendBy($token, array $params = [])
     {
+        $this->_token = $token;
+        return $this->send($params);
+    }
+
+    /**
+     * Send this request by this method.
+     *
+     * @param array $params
+     * @return array
+     */
+    public function send(array $params = [])
+    {
+        \Yii::configure($this, $params);
+
         if ($this->hasFile()) {
-            return $this->sendFile($token);
+            return $this->sendFile($this->_token);
         }
 
-        return $this->sendRequest($token);
+        return $this->sendRequest($this->_token);
     }
 
     /**
