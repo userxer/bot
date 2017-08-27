@@ -6,6 +6,7 @@ use bot\object\Error;
 use bot\object\Object;
 use yii\helpers\ArrayHelper as AH;
 use yii\base\UnknownClassException;
+use yii\base\InvalidParamException;
 
 /**
  * Available methods
@@ -50,7 +51,7 @@ abstract class Method extends Request
      * @param string $token
      * @param array $params
      */
-    public function __construct($token, array $params = [])
+    public function __construct($token = null, array $params = [])
     {
         $this->_token = $token;
         $this->__set('method', $this->methodName());
@@ -68,6 +69,12 @@ abstract class Method extends Request
      */
     public function send(array $params = [])
     {
+        if ($this->_token == null) {
+            $className = self::className();
+            $message = 'token must be ready, use ' . $className . '::sendBy($token).';
+            throw new InvalidParamException('Invalid Param: ' . $message);
+        }
+        
         \Yii::configure($this, $params);
         $res = parent::sendBy($this->_token);
 
