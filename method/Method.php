@@ -80,6 +80,7 @@ abstract class Method extends Request
      * @param array $params
      * @return array|bool|Error|mixed
      * @throws UnknownClassException
+     * @throws InvalidParamException
      */
     public function send(array $params = [])
     {
