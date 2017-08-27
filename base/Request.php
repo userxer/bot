@@ -144,7 +144,7 @@ class Request extends Object
         // Send Request
         $res = $this->sendRequest($token, function (Curl $curl) {
             $curl->setOptions([
-                CURLOPT_SAFE_UPLOAD  => true,
+                CURLOPT_SAFE_UPLOAD     => true,
                 CURLOPT_HTTPHEADER      => [
                     'Content-Type: multipart/form-data'
                 ]
