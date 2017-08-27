@@ -6,6 +6,7 @@ use bot\object\File;
 use bot\helper\Token;
 use yii\helpers\Json;
 use yii\helpers\ArrayHelper as AH;
+use yii\base\InvalidParamException;
 
 /**
  * All queries to the Telegram Bot API must be served over
@@ -142,9 +143,16 @@ class Request extends Object
      *
      * @param array $params
      * @return array
+     * @throws InvalidParamException
      */
     public function send(array $params = [])
     {
+        if ($this->_token == null) {
+            $className = self::className();
+            $message = 'token must be ready, use ' . $className . '::sendBy($token).';
+            throw new InvalidParamException('Invalid Param: ' . $message);
+        }
+
         \Yii::configure($this, $params);
 
         if ($this->hasFile()) {
