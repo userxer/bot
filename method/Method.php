@@ -59,6 +59,20 @@ abstract class Method extends Request
         parent::__construct($params);
     }
 
+    
+    /**
+     * Send this request by this method.
+     * 
+     * @param string $token the bot token string
+     * @param array $params
+     * @return array|bool|Error|mixed
+     */
+    public function sendBy($token, array $params = [])
+    {
+        $this->_token = $token;
+        return $this->send($params);
+    }
+    
     /**
      * Send this method with all params
      * to Telegram server.
