@@ -59,7 +59,6 @@ abstract class Method extends Request
         parent::__construct($params);
     }
 
-    
     /**
      * Send this request by this method.
      * 
