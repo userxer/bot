@@ -1,6 +1,7 @@
 <?php namespace bot\helper;
 
 use yii\base\Object;
+use yii\base\InvalidParamException;
 
 /**
  * Authorizing your bot
@@ -49,6 +50,7 @@ class Token extends Object
     /**
      * Token constructor.
      * @param string $token
+     * @throws InvalidParamException
      */
     public function __construct($token)
     {
@@ -61,7 +63,7 @@ class Token extends Object
         }
         else {
             $message = 'Invalid Token: ' . $token;
-            throw new \InvalidArgumentException($message);
+            throw new InvalidParamException($message);
         }
 
         parent::__construct();
