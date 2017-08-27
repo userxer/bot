@@ -41,22 +41,14 @@ abstract class Method extends Request
     }
 
     /**
-     * Telegram's bot token
-     * @var string
-     */
-    private $_token;
-
-    /**
      * Method constructor.
      * @param string $token
      * @param array $params
      */
     public function __construct($token = null, array $params = [])
     {
-        $this->_token = $token;
         $this->__set('method', $this->methodName());
-
-        parent::__construct($params);
+        parent::__construct($token, $params);
     }
 
     /**
@@ -90,7 +82,7 @@ abstract class Method extends Request
         }
         
         \Yii::configure($this, $params);
-        $res = parent::sendBy($this->_token);
+        $res = parent::send();
 
         // Success
         if ($res['ok'] && isset($res['result'])) {
