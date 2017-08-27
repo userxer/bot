@@ -81,8 +81,7 @@ abstract class Method extends Request
             throw new InvalidParamException('Invalid Param: ' . $message);
         }
         
-        \Yii::configure($this, $params);
-        $res = parent::send();
+        $res = parent::send($params);
 
         // Success
         if ($res['ok'] && isset($res['result'])) {
