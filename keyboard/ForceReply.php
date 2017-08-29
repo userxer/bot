@@ -14,8 +14,8 @@
  * @method bool hasSelective()
  * @method $this setForceReply($bool)
  * @method $this setSelective($bool)
- * @method $this delForceReply()
- * @method $this delSelective()
+ * @method $this remForceReply()
+ * @method $this remSelective()
  * @method True getForceReply($default = null)
  * @method bool getSelective($default = null)
  *

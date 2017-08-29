@@ -12,8 +12,8 @@
  * @method bool hasLongitude()
  * @method $this setLatitude($float)
  * @method $this setLongitude($float)
- * @method $this delLatitude()
- * @method $this delLongitude()
+ * @method $this remLatitude()
+ * @method $this remLongitude()
  * @method float getLatitude($default = null)
  * @method float getLongitude($default = null)
  *

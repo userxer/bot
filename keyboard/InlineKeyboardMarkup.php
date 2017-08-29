@@ -12,7 +12,7 @@ use bot\keyboard\button\InlineKeyboardButton;
  *
  * @method bool hasInlineKeyboard()
  * @method $this setInlineKeyboard($array)
- * @method $this delInlineKeyboard()
+ * @method $this remInlineKeyboard()
  * @method array getInlineKeyboard($default = null)
  *
  * @author Mehdi Khodayari <mehdi.khodayari.khoram@gmail.com>

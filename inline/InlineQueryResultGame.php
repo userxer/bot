@@ -13,8 +13,8 @@ use bot\keyboard\InlineKeyboardMarkup;
  * @method bool hasReplyMarkup()
  * @method $this setGameShortName($string)
  * @method $this setReplyMarkup(InlineKeyboardMarkup $markup)
- * @method $this delGameShortName()
- * @method $this delReplyMarkup()
+ * @method $this remGameShortName()
+ * @method $this remReplyMarkup()
  * @method string getGameShortName($default = null)
  * @method InlineKeyboardMarkup getReplyMarkup($default = null)
  *

@@ -11,8 +11,8 @@
  * @method bool hasSelective()
  * @method $this setRemoveKeyboard($true)
  * @method $this setSelective($boolean)
- * @method $this delRemoveKeyboard()
- * @method $this delSelective()
+ * @method $this remRemoveKeyboard()
+ * @method $this remSelective()
  * @method true getRemoveKeyboard($default = null)
  * @method bool getSelective($default = null)
  *

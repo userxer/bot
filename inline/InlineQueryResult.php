@@ -28,7 +28,7 @@ use bot\base\Object;
  *
  * @method bool hasId()
  * @method $this setId($string)
- * @method $this delId()
+ * @method $this remId()
  * @method string getId($default = null)
  *
  * @author Mehdi Khodayari <mehdi.khodayari.khoram@gmail.com>
