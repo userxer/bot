@@ -27,120 +27,106 @@ abstract class Method extends Request
 {
 
     /**
-     * The method real name.
+     * Returns the fully qualified name of this method.
      * @return string
      */
     public static function methodName()
     {
         $nameSpace = self::className();
-        $className = basename(str_replace('\\', '/', $nameSpace));
+        $className = end(explode('\\', $nameSpace));
         $methodName = lcfirst($className);
-
         return $methodName;
     }
 
     /**
      * Method constructor.
-     * @param string $token
-     * @param array $params
+     * @param string $token the bot api server
+     * @param array $params properties of object request
      */
-    public function __construct($token = null, array $params = [])
+    public function __construct($token = null, $params = [])
     {
         $this->__set('method', $this->methodName());
-        parent::__construct($token, $params);
+        \Yii::configure($this, $params);
+        parent::__construct($token);
     }
 
     /**
-     * Send this request by this method.
-     * 
-     * @param string $token the bot token string
-     * @param array $params
-     * @return array|bool|Error|mixed
-     */
-    public function sendBy($token, array $params = [])
-    {
-        $this->_token = $token;
-        return $this->send($params);
-    }
-    
-    /**
-     * Send this method with all params
-     * to Telegram server.
+     * Send this request by old token, you can use next token by
+     * self::sendBy() method instead of this method.
      *
-     * @param array $params
-     * @return array|bool|Error|mixed
-     * @throws UnknownClassException
+     * @param array $params properties of object request
+     * @return object of response
      */
     public function send(array $params = [])
     {
         $res = parent::send($params);
 
-        // Success
-        if ($res['ok'] && isset($res['result'])) {
-            if (is_array($res['result'])) {
+        // success
+        if (
+            $res['ok'] !== false &&
+            AH::keyExists('result', $res)
+        ) {
+            $result = $res['result'];
+            if (is_array($result)) {
                 $className = $this->response();
                 if (class_exists($className)) {
-                    return $this->introduceMap($className, $res['result']);
+                    return $this->joinRelations($className, $result);
                 }
             }
 
-            return $res['result'];
+            return $result;
         }
 
-        // Warning
-        else if (is_array($res)) {
+        // warning
+        if (is_array($res)) {
             $error = new Error($res);
             $code = $error->getErrorCode();
             $description = $error->getDescription();
-            $id = (new Token($this->_token))->getId();
+            $id = (new Token($this->token))->getId();
 
             if (YII_DEBUG === true) {
-                $info = '[' . $id. '][' . $code . ']';
-                \Yii::warning($info . ' ' . $description, self::className());
+                $message = '[' . $id. '][' . $code . '] ' . $description;
+                \Yii::warning($message, self::className());
             }
 
             return $error;
         }
 
-        // Error
+        // error
         return false;
     }
 
     /**
-     * Find relations and introduce to owen classes,
-     * and return the property's value.
+     * Finding the relationships of each object and connecting
+     * them to helps us to access relationships of object.
      *
      * @param string $className the relation class's name
      * @param mixed $value the value to set relation
      * @return mixed
      * @throws UnknownClassException
      */
-    private function introduceMap($className, $value)
+    private function joinRelations($className, $value)
     {
-        // is associative
         if (AH::isAssociative($value)) {
-
-            // is Telegram Object
             $class = new $className($value);
             if ($class instanceof Object) {
                 return $class;
             }
 
-            throw new UnknownClassException($className . ' not Telegram Object.');
+            $message = $className . ' isn\'t a response object.';
+            throw new UnknownClassException($message);
         }
 
-        // is indexed
-        else if (AH::isIndexed($value)) {
+        if (AH::isIndexed($value)) {
             $output = [];
-            foreach ($value as $_key => $_value) {
-                $relation = $this->introduceMap($className, $_value);
-                $output[$_key] = $relation;
+            foreach ($value as $_name => $_value) {
+                $relation = $this->joinRelations($className, $_value);
+                $output[$_name] = $relation;
             }
 
             return $output;
         }
 
-        // is't array
         return $value;
     }
 
