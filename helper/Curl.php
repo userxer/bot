@@ -2,7 +2,7 @@
 
 use yii\helpers\Json;
 use yii\base\Exception;
-use yii\helpers\ArrayHelper;
+use yii\helpers\ArrayHelper as AH;
 
 /**
  * Curl is a library that lets you make HTTP requests in PHP.
@@ -85,7 +85,7 @@ class Curl
      */
     public function unsetOption($key)
     {
-        ArrayHelper::remove($this->_options, $key);
+        AH::remove($this->_options, $key);
         return $this;
     }
 
@@ -116,7 +116,7 @@ class Curl
     public function getOption($key, $default = null)
     {
         $os = $this->getOptions();
-        $value = ArrayHelper::getValue($os, $key, $default);
+        $value = AH::getValue($os, $key, $default);
 
         return $value;
     }
@@ -129,7 +129,7 @@ class Curl
     {
         $o = $this->_options;
         $do = $this->_default_options;
-        return ArrayHelper::merge($do, $o);
+        return AH::merge($do, $o);
     }
 
     /**
@@ -201,24 +201,27 @@ class Curl
      */
     public function send($method, $url, $raw = false)
     {
-        // set curl method
+        // method of request
         $method = strtoupper($method);
         $this->setOption(CURLOPT_CUSTOMREQUEST, $method);
 
-        // is head
+        // is head request
         if ($method === 'HEAD') {
             $this->setOption(CURLOPT_NOBODY, true);
             $this->unsetOption(CURLOPT_WRITEFUNCTION);
         }
 
-        // send http request
+        // create curl
         $this->_curl = curl_init($url);
         curl_setopt_array($this->_curl, $this->getOptions());
+
+        // sending request
         $response = curl_exec($this->_curl);
 
         // debugging
+        $code = CURLINFO_HTTP_CODE;
         $this->__checkError($response);
-        $this->code = curl_getinfo($this->_curl, CURLINFO_HTTP_CODE);
+        $this->code = curl_getinfo($this->_curl, $code);
 
         // result
         if ($method === 'HEAD') return true;
@@ -229,6 +232,7 @@ class Curl
     }
 
     /**
+     * Check out cur error
      * @param mixed $response
      * @throws Exception
      */
