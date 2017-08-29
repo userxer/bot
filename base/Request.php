@@ -3,8 +3,8 @@
 use bot\InputFile;
 use bot\helper\Curl;
 use bot\object\File;
-use bot\helper\Token;
 use yii\helpers\Json;
+use bot\helper\Token;
 use yii\helpers\ArrayHelper as AH;
 use yii\base\InvalidParamException;
 
@@ -43,52 +43,61 @@ use yii\base\InvalidParamException;
  */
 class Request extends Object
 {
-    
+
     /**
-     * Telegram's bot token
-     * @var string
+     * @var string the bot api server
      */
-    protected $_token;
+    const HOST = 'https://api.telegram.org';
+
+    /**
+     * @var string of bot token
+     */
+    protected $token;
 
     /**
      * Request constructor.
      * @param string $token
-     * @param array $params
      */
-    public function __construct($token = null, array $params = [])
+    public function __construct($token = null)
     {
-        $this->_token = $token;
-        parent::__construct($params);
+        $this->token = $token;
+        parent::__construct();
     }
-    
+
     /**
-     * Checks if a property is set, i.e.
-     * defined and not null.
+     * Checks if a property is set, i.e. defined and not null.
+     * Do not call this method directly as it is a PHP magic method that
+     * will be implicitly called when executing
+     * `isset($object->property)`.
      *
      * Note that if the property is not defined,
      * false will be returned.
      *
      * @param string $name the property name or the event name
      * @return bool whether the named property is set (not null).
+     * @see http://php.net/manual/en/function.isset.php
      */
     public function has($name)
     {
-        return $this->__isset($name);
+        $has = $this->__isset($name);
+        return $has;
     }
 
     /**
      * Sets an object property to null.
+     * Do not call this method directly as it is a PHP magic method that
+     * will be implicitly called when executing
+     * `unset($object->property)`.
      *
      * Note that if the property is not defined,
      * this method will do nothing.
      *
-     * If the property is read-only,
-     * it will throw an exception.
-     *
+     * If the property is read-only, it will throw an exception.
      * @param string $name the property name
-     * @return $this
+     * @return mixed the property last value
+     * @see http://php.net/manual/en/function.unset.php
      */
-    public function delete($name)
+    public function remove($name)
     {
         $this->__unset($name);
         return $this;
@@ -96,6 +105,9 @@ class Request extends Object
 
     /**
      * Sets value of an object property.
+     * Do not call this method directly as it is a PHP magic method that
+     * will be implicitly called when executing
+     * `$object->property = $value;`.
      *
      * @param string $name the property name or the event name
      * @param mixed $value the property value
@@ -109,16 +121,20 @@ class Request extends Object
 
     /**
      * Returns the value of an object property.
+     * Do not call this method directly as it is a PHP magic method that
+     * will be implicitly called when executing
+     * `$value = $object->property;`.
      *
      * @param string $name the property name
-     * @param mixed $default the default value to be returned if the specified array
-     * key does not exist. Not used when getting value from an object.
+     * @param  mixed $default the default value to be returned if the
+     * specified array key does not exist. Not used when getting value
+     * from an object.
      *
-     * @return mixed
+     * @return mixed the property value
      */
     public function get($name, $default = null)
     {
-        if ($this->__isset($name)) {
+        if ($this->has($name)) {
             return $this->__get($name);
         }
 
@@ -126,129 +142,53 @@ class Request extends Object
     }
 
     /**
-     * Send this request by this method.
+     * Send this request by token, in next time can use self::send()
+     * method instead of this method.
      *
-     * @param string $token the bot token string
-     * @param array $params
-     * @return array
+     * @param string $token a unique authentication token
+     * @param array $params properties of object request
+     * @return array is the a result
      */
-    public function sendBy($token, array $params = [])
+    public function sendBy($token, $params = [])
     {
-        $this->_token = $token;
+        $this->token = $token;
         return $this->send($params);
     }
 
     /**
-     * Send this request by this method.
+     * Send this request by old token, you can use next token by
+     * self::sendBy() method instead of this method.
      *
-     * @param array $params
-     * @return array
-     * @throws InvalidParamException
+     * @param array $params properties of object request
+     * @return array is the a result
      */
-    public function send(array $params = [])
+    public function send($params = [])
     {
-        if ($this->_token == null) {
-            $className = self::className();
-            $message = 'token must be ready, use ' . $className . '::sendBy($token).';
-            throw new InvalidParamException('Invalid Param: ' . $message);
+        if ($this->token == null) {
+            $message = 'There is no token in request.';
+            throw new InvalidParamException($message);
         }
 
         \Yii::configure($this, $params);
-
-        if ($this->hasFile()) {
-            return $this->sendFile($this->_token);
-        }
-
-        return $this->sendRequest($this->_token);
+        if ($this->__hasFile()) return $this->__sendFile();
+        else return $this->__send();
     }
 
     /**
-     * If request have file is better send with this method.
-     *
-     * @param string $token the telegram's bot token
-     * @return array
-     */
-    private function sendFile($token)
-    {
-        // Cache ID
-        $tObj = new Token($token);
-        $cID = 'B:' . $tObj->id . ':';
-
-        // Cache duration time
-        $duration = $this->get('cache_time', 0);
-        $this->delete('cache_time');
-
-        // Replace files instead short ID as file.
-        $this->replaceFileID($cID);
-
-        // Send Request
-        $res = $this->sendRequest($token, function (Curl $curl) {
-            $curl->setOptions([
-                CURLOPT_SAFE_UPLOAD     => true,
-                CURLOPT_HTTPHEADER      => [
-                    'Content-Type: multipart/form-data'
-                ]
-            ]);
-        });
-
-        // Set cache duration again
-        $this->set('cache_time', $duration);
-
-        // Save Files IDs
-        $this->saveFileID($cID, $duration, $res);
-        return $res;
-    }
-
-    /**
-     * Send http request with this request params to
-     * telegram server safely.
-     *
-     * @param string $token the telegram's bot token
-     * @param string|array|callable $callback
-     * @return array
-     */
-    private function sendRequest($token, $callback = null)
-    {
-        $curl = new Curl();
-        $curl->setOption(CURLOPT_TIMEOUT, 30);
-        $curl->setOption(CURLOPT_HEADER, false);
-        $curl->setOption(CURLOPT_RETURNTRANSFER, true);
-        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
-
-        $params = [];
-        foreach ($this->toArray() as $key => $value) {
-            if (is_array($value)) {
-                $params[$key] = Json::encode($value);
-                continue;
-            }
-
-            $params[$key] = $value;
-        }
-
-        $curl->setOption(CURLOPT_POSTFIELDS, $params);
-        @call_user_func($callback, $curl);
-
-        // send http request
-        $baseUrl = 'https://api.telegram.org/bot{token}/';
-        $url = str_replace('{token}', $token, $baseUrl);
-        return $curl->post($url, true);
-    }
-
-    /**
-     * Check out this request to find File,
-     * if find any file return true, otherwise
-     * return false.
-     *
+     * Checking whether the file is in this request will help us
+     * to save the files in the memory system so that later we
+     * do not need to upload files again.
+     * 
      * @return bool
      */
-    private function hasFile()
+    public function __hasFile()
     {
-        foreach ($this->toArray() as $key => $value) {
+        $properties = $this->properties;
+        foreach ($properties as $name => $value) {
             if (
                 $value instanceof InputFile ||
                 filter_var($value, FILTER_VALIDATE_URL)
-            )
-            {
+            ) {
                 return true;
             }
         }
@@ -257,57 +197,96 @@ class Request extends Object
     }
 
     /**
-     * Replace file instead short ID as file.
-     * @param string $cID the Cache id
+     * Send request with file, this method take
+     * a few second to get back result.
+     *
+     * @return array
      */
-    private function replaceFileID($cID)
+    private function __sendFile()
     {
-        $params = $this->toArray();
-        foreach ($params as $key => $value) {
+        $token = new Token($this->token);
+        $cID = 'BOT:' . $token->id . ':';
+
+        $duration = $this->get('cache_time', 0);
+        $this->remove('cache_time');
+
+        $properties = $this->properties;
+        foreach ($properties as $name => $value) {
             if ($value instanceof InputFile) {
                 $path = $value->getFilename();
                 $fID = $cID . md5_file($path);
 
                 if ($file_id = \Yii::$app->cache->get($fID)) {
-                    $this->set($key, $file_id);
+                    $this->set($name, $file_id);
                 }
             }
         }
-    }
 
-    /**
-     * Save file's IDs in yii cache.
-     *
-     * @param string $cID the Cache id
-     * @param int $duration default duration in seconds before the cache will expire. If not set,
-     * default [[defaultDuration]] value is used.
-     * @param array $res the request response.
-     * @throws \yii\base\InvalidConfigException
-     */
-    private function saveFileID($cID, $duration, $res)
-    {
+        $res = $this->__send(function (Curl $curl) {
+            $curl->setOptions([
+                CURLOPT_RETURNTRANSFER  => true,
+                CURLOPT_HTTPHEADER      => [
+                    'Content-Type: multipart/form-data'
+                ]
+            ]);
+        });
+
         if ($res['ok'] && isset($res['result'])) {
-            $params = $this->toArray();
-            foreach ($params as $key => $value) {
+            foreach ($properties as $name => $value) {
                 if (
                     $value instanceof InputFile &&
-                    isset($response['result'][$key])
+                    isset($response['result'][$name])
                 ) {
                     $path = $value->getFilename();
                     $fID = $cID . md5_file($path);
 
-                    $file = $response['result'][$key];
-                    if (AH::isIndexed($file)) {
-                        $file = end($file);
-                    }
-
+                    $file = $response['result'][$name];
+                    if (AH::isIndexed($file)) $file = end($file);
                     $file = new File($file);
-                    if ($file->hasFileId() && !\Yii::$app->get($fID, false)) {
+
+                    if (
+                        $file->hasFileId() &&
+                        !\Yii::$app->get($fID, false)
+                    ) {
                         $file_id = $file->getFileId();
                         \Yii::$app->cache->set($fID, $file_id, $duration);
                     }
                 }
             }
         }
+
+        return $res;
+    }
+
+    /**
+     * Send request without file, this method take
+     * a few second to get back result.
+     *
+     * @param callable $callback
+     * @return array
+     */
+    private function __send($callback = null)
+    {
+        $curl = new Curl();
+        $curl->setOption(CURLOPT_TIMEOUT, 30);
+        $curl->setOption(CURLOPT_HEADER, false);
+        $curl->setOption(CURLOPT_SAFE_UPLOAD, true);
+        $curl->setOption(CURLOPT_SSL_VERIFYPEER, false);
+
+        $params = [];
+        foreach ($this->__toArray() as $name => $value) {
+            if (is_array($value)) {
+                $params[$name] = Json::encode($value);
+                continue;
+            }
+
+            $params[$name] = $value;
+        }
+
+        $curl->setOption(CURLOPT_POSTFIELDS, $params);
+        @call_user_func($callback, $curl);
+
+        $url = self::HOST . '/bot' . $this->token . '/';
+        return $curl->post($url, true);
     }
 }
