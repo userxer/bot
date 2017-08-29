@@ -33,7 +33,8 @@ abstract class Method extends Request
     public static function methodName()
     {
         $nameSpace = self::className();
-        $className = end(explode('\\', $nameSpace));
+        $className = str_replace('\\', '/' , $nameSpace);
+        $className = basename($className);
         $methodName = lcfirst($className);
         return $methodName;
     }
@@ -57,7 +58,7 @@ abstract class Method extends Request
      * @param array $params properties of object request
      * @return object of response
      */
-    public function send(array $params = [])
+    public function send($params = [])
     {
         $res = parent::send($params);
 
