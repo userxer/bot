@@ -1,4 +1,6 @@
 ## Instructions
+### Wiki
+Read our wiki in [here](https://github.com/mehdikhody/bot/wiki).
 
 ### An introduction for developers
 Bots are third-party applications that run inside Telegram. Users can interact with bots by sending them messages, commands and [inline requests](https://core.telegram.org/bots#inline-mode). You control your bots using HTTPS requests to our [bot API](https://core.telegram.org/bots/api).
