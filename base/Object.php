@@ -197,8 +197,8 @@ class Object
      */
     public function __call($name, $params)
     {
-        $property = $this->fixPropertyName($name);
-        $action = $this->findPropertyAction($name);
+        $property = $this->getPropertyName($name);
+        $action = $this->getPropertyAction($name);
 
         // Delete property from class
         if ($action == 'del') {
@@ -286,7 +286,7 @@ class Object
      * @param string $name the method name
      * @return string the true property's name
      */
-    private function fixPropertyName($name)
+    private function getPropertyName($name)
     {
         $pattern = '/([A-Z])/';
         $fLower = lcfirst(substr($name, 3));
@@ -300,7 +300,7 @@ class Object
      * @return string the action's name
      * @throws \Exception
      */
-    private function findPropertyAction($name)
+    private function getPropertyAction($name)
     {
         foreach (['set', 'get', 'has', 'del'] as $action) {
             $pattern = '/^' . $action . '(.+)/';
