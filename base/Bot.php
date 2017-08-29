@@ -371,7 +371,7 @@ class Bot extends \yii\base\Object
             self::$update == null && 
             !empty($update) && is_string($update)
         ) {
-            self::setUpdate($update);
+            $this->setUpdate($update);
         }
 
         parent::init();
@@ -386,7 +386,7 @@ class Bot extends \yii\base\Object
         if (is_int($id)) {
             self::$id = $id;
 
-            if (isset(self::$key)) {
+            if (self::$key !== null) {
                 $this->setToken(self::$id . ':' . self::$key);
             }
         }
@@ -401,7 +401,7 @@ class Bot extends \yii\base\Object
         if (is_string($key)) {
             self::$key = $key;
 
-            if (isset(self::$id)) {
+            if (self::$id !== null) {
                 $this->setToken(self::$id . ':' . self::$key);
             }
         }
