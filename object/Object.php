@@ -23,35 +23,27 @@ abstract class Object extends \bot\base\Object
 {
 
     /**
-     * Object constructor.
-     * @param array $properties
-     */
-    public function __construct(array $properties)
-    {
-        parent::__construct($properties);
-    }
-
-    /**
      * Initializes the object.
      * This method is invoked at the end of the constructor after
      * the object is initialized with the given configuration.
      */
     public function init()
     {
-        foreach ($this->relations() as $property => $className) {
+        $relations = $this->relations();
+        foreach ($relations as $name => $className) {
+            if (
+                class_exists($className) &&
+                $this->__isset($name)
+            ) {
+                $baseValue = $this->__get($name);
+                $value = $this->joinRelations($className, $baseValue);
 
-            // real relation
-            if (class_exists($className) && $this->__isset($property)) {
-                $baseValue = $this->__get($property);
-                $value = $this->introduceMap($className, $baseValue);
-
-                // set property with owen relation
-                $this->__set($property, $value);
+                // set property by relation
+                $this->__set($name, $value);
             }
 
-            // not found relation
             else if (!class_exists($className)) {
-                $message = $className . ' not found in relations ' . get_class($this);
+                $message = 'Not found relation: ' . $className;
                 throw new UnknownClassException($message);
             }
         }
@@ -60,40 +52,36 @@ abstract class Object extends \bot\base\Object
     }
 
     /**
-     * Find relations and introduce to owen classes,
-     * and return the property's value.
+     * Finding the relationships of each object and connecting
+     * them to helps us to access relationships of object.
      *
-     * @param string $className the relation class's name
-     * @param mixed $value the value to set relation
+     * @param string $className name of object
+     * @param mixed $value of relation
      * @return mixed
      * @throws UnknownClassException
      */
-    private function introduceMap($className, $value)
+    private function joinRelations($className, $value)
     {
-        // is associative
         if (AH::isAssociative($value)) {
-
-            // is Telegram Object
             $class = new $className($value);
             if ($class instanceof Object) {
                 return $class;
             }
 
-            throw new UnknownClassException($className . ' not Telegram Object.');
+            $message = $className . ' isn\'t a response object.';
+            throw new UnknownClassException($message);
         }
 
-        // is indexed
-        else if (AH::isIndexed($value)) {
+        if (AH::isIndexed($value)) {
             $output = [];
-            foreach ($value as $_key => $_value) {
-                $relation = $this->introduceMap($className, $_value);
-                $output[$_key] = $relation;
+            foreach ($value as $_name => $_value) {
+                $relation = $this->joinRelations($className, $_value);
+                $output[$_name] = $relation;
             }
 
             return $output;
         }
 
-        // is't array
         return $value;
     }
 
