@@ -18,8 +18,8 @@ use bot\object\Error;
  * @method bool hasPhoto()
  * @method $this setChatId($integer)
  * @method $this setPhoto($file)
- * @method $this delChatId()
- * @method $this delPhoto()
+ * @method $this remChatId()
+ * @method $this remPhoto()
  * @method string|int getChatId($default = null)
  * @method InputFile getPhoto($default = null)
  *

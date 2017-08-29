@@ -19,7 +19,7 @@ use bot\object\Error;
  * @method File|Error send()
  * @method bool hasFileId()
  * @method $this setFileId($string)
- * @method $this delFileId()
+ * @method $this remFileId()
  * @method string getFileId($default = null)
  *
  * @author Mehdi Khodayari <mehdi.khodayari.khoram@gmail.com>

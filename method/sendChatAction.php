@@ -23,8 +23,8 @@ use bot\object\Message;
  * @method bool hasAction()
  * @method $this setChatId($integer)
  * @method $this setAction($string)
- * @method $this delChatId()
- * @method $this delAction()
+ * @method $this remChatId()
+ * @method $this remAction()
  * @method string|int getChatId($default = null)
  * @method string getAction($default = null)
  *

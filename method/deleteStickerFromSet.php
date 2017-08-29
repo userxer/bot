@@ -9,7 +9,7 @@ use bot\object\Error;
  * @method true|Error send()
  * @method bool hasSticker()
  * @method $this setSticker($string)
- * @method $this delSticker()
+ * @method $this remSticker()
  * @method string getSticker($default = null)
  *
  * @author Mehdi Khodayari <mehdi.khodayari.khoram@gmail.com>

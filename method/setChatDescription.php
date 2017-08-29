@@ -13,8 +13,8 @@ use bot\object\Error;
  * @method bool hasDescription()
  * @method $this setChatId($integer)
  * @method $this setDescription($string)
- * @method $this delChatId()
- * @method $this delDescription()
+ * @method $this remChatId()
+ * @method $this remDescription()
  * @method string|int getChatId($default = null)
  * @method string getDescription($default = null)
  *

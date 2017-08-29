@@ -12,8 +12,8 @@ use bot\object\ChatMember;
  * @method bool hasUserId()
  * @method $this setChatId($integer)
  * @method $this setUserId($integer)
- * @method $this delChatId()
- * @method $this delUserId()
+ * @method $this remChatId()
+ * @method $this remUserId()
  * @method string|int getChatId($default = null)
  * @method int getUserId($default = null)
  *

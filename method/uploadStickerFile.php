@@ -13,8 +13,8 @@ use bot\object\Error;
  * @method bool hasPngSticker()
  * @method $this setUserId($integer)
  * @method $this setPngSticker($file)
- * @method $this delUserId()
- * @method $this delPngSticker()
+ * @method $this remUserId()
+ * @method $this remPngSticker()
  * @method int getUserId($default = null)
  * @method InputFile getPngSticker($default = null)
  *

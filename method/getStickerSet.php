@@ -10,7 +10,7 @@ use bot\object\StickerSet;
  * @method StickerSet|Error send()
  * @method bool hasName()
  * @method $this setName($string)
- * @method $this delName()
+ * @method $this remName()
  * @method string getName($default = null)
  *
  * @author Mehdi Khodayari <mehdi.khodayari.khoram@gmail.com>

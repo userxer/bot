@@ -17,8 +17,8 @@ use bot\object\Error;
  * @method bool hasTitle()
  * @method $this setChatId($integer)
  * @method $this setTitle($string)
- * @method $this delChatId()
- * @method $this delTitle()
+ * @method $this remChatId()
+ * @method $this remTitle()
  * @method string|int getChatId($default = null)
  * @method string getTitle($default = null)
  *

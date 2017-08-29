@@ -12,8 +12,8 @@ use bot\object\Error;
  * @method bool hasPosition()
  * @method $this setSticker($string)
  * @method $this setPosition($integer)
- * @method $this delSticker()
- * @method $this delPosition()
+ * @method $this remSticker()
+ * @method $this remPosition()
  * @method string getSticker($default = null)
  * @method int getPosition($default = null)
  *

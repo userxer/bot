@@ -17,8 +17,8 @@ use bot\object\Error;
  * @method bool hasMessageId()
  * @method $this setChatId($integer)
  * @method $this setMessageId($integer)
- * @method $this delChatId()
- * @method $this delMessageId()
+ * @method $this remChatId()
+ * @method $this remMessageId()
  * @method string|int getChatId($default = null)
  * @method int getMessageId($default = null)
  *

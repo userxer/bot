@@ -11,7 +11,7 @@ use bot\object\Error;
  * @method string|Error send()
  * @method bool hasChatId()
  * @method $this setChatId($integer)
- * @method $this delChatId()
+ * @method $this remChatId()
  * @method string|int getChatId($default = null)
  *
  * @author Mehdi Khodayari <mehdi.khodayari.khoram@gmail.com>
