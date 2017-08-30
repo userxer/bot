@@ -102,7 +102,7 @@ class Bot extends \yii\base\Object
      * @param string $key the property name
      * @return true
      */
-    public static function delete($key)
+    public static function remove($key)
     {
         AH::remove(self::$configs, $key);
         return true;
