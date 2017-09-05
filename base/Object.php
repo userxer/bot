@@ -193,8 +193,8 @@ class Object extends \yii\base\Object
             $default = sizeof($params) > 0 ? $params[0] : null;
 
             // if it exists
-            if ($this->__isset($property)) {
-                return $this->__get($property);
+            if ($this->__isset($name)) {
+                return $this->__get($name);
             }
 
             return $default;
